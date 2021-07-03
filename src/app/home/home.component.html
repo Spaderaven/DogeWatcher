@@ -44,7 +44,7 @@
                         <div class="col-6">
                             <h3 class="center">Cantidad</h3>
                             <div class="input-group input-group-lg">
-                                <input type="number" class="form-control" placeholder="{{ info.dogecoin.mxn }}" [(ngModel)]="newLowValue">
+                                <input type="number" class="form-control" placeholder="{{ user.valueHigh ? user.valueHigh : info.dogecoin.mxn  }}" [(ngModel)]="newLowValue">
                                 <span class="input-group-text" id="inputGroup-sizing-lg">MXN</span>
                             </div>
                         </div>
