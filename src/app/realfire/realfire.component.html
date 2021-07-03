@@ -1,0 +1,28 @@
+<body>
+    
+    <div class="row"> 
+
+    </div>
+
+    <div class="row center m-5">
+        <img src="..\assets\Doge.png" class="img-fluid" alt="Un Doge Bonito">
+    </div>
+
+    <div class="row center m-5" *ngIf="newRes[2] == 'High'">
+        <h1  >🚀 SUBIOOOOOO 🚀</h1>
+    </div>
+
+    <div class="row center m-5" *ngIf="newRes[2] == 'Low'">
+        <h1>🪂 BAJOOOOOOOO 🪂</h1>
+    </div>
+    
+    <div class="row center m-5" *ngIf="newRes[2] == 'High'">
+        <img src="../../assets/Happy.gif" class="img-fluid" alt="">
+    </div>
+
+    <div class="row center m-5" *ngIf="newRes[2] == 'Low'">
+        <img src="../../assets/Sad.gif" class="img-fluid" alt="">
+    </div>
+
+</body>
+

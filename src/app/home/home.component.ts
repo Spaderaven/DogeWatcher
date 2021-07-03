@@ -1,9 +1,12 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { interval, Observable } from 'rxjs';
 import { mapTo, startWith, map, flatMap } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
+import { MiserviceService } from '../miservice.service';
+import { RealfireComponent } from '../realfire/realfire.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -24,7 +27,9 @@ export class HomeComponent{
   newHigColor;
   newLowColor;
 
-  constructor( private _http: HttpClient, private store: AngularFirestore, private route: ActivatedRoute ) {
+  @Output() messageEvent = new EventEmitter<string>();
+
+  constructor( private router: Router, private _http: HttpClient, private store: AngularFirestore, private route: ActivatedRoute, private miService: MiserviceService ) {
 
     const elem = this.route.snapshot.paramMap.get("element");
     this.fireBaseId = elem;
@@ -58,8 +63,14 @@ export class HomeComponent{
   }
 
   CheckPrice(result)  {
-    if(result?.dogecoin.mxn >= this.user?.valueHigh){ this.SendColor(this.user?.colorHigh) }
-    else if(result?.dogecoin.mxn <= this.user?.valueLow){ this.SendColor(this.user?.colorLow) }
+    if(result?.dogecoin.mxn >= this.user?.valueHigh){ 
+      const res = this.fireBaseId + "," + this.user?.colorHigh + "," + "High";
+      this.SendColor(res)
+     }
+    else if(result?.dogecoin.mxn <= this.user?.valueLow){ 
+      const res = this.fireBaseId + "," + this.user?.colorLow + "," + "Low";
+      this.SendColor(res)
+     }
   }
 
   changeCompleteGoodPrice(event){
@@ -87,12 +98,15 @@ export class HomeComponent{
     this.store.collection('users').doc(this.fireBaseId).set(newUser);
     this.user = newUser;
     console.log("saved");
-    
+    this.isChange = false
   }
 
-  SendColor(color){
-    console.log("EL COLOOOOOOOOOR", color);
+  SendColor(res){
+    console.log("EL COLOOOOOOOOOR", res);
+    this.miService.sendNewEvent(res);
     // SEND TO THE THIIIIIIIIING
+    this.router.navigate(["/fire", {element: res}])
+
   }
 
 }
