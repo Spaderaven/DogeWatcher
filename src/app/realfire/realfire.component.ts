@@ -21,28 +21,16 @@ export class RealfireComponent implements AfterViewInit{
 
   constructor(private router: Router, private _http: HttpClient, private db: AngularFireDatabase, private route: ActivatedRoute, private miService: MiserviceService ) {
 
-    // this.newEventSubscription = this.miService.getNewEvent().subscribe( (color)=> {
-    //   this.UploadDB(color);
-    // })
-
     const res = this.route.snapshot.paramMap.get("element");
     this.newRes = res.split(",");
-    console.log("RESULTDAOR", this.newRes);
-
   }
 
   ngOnInit(): void {
   }
 
-  // UploadDB(color){
-  //   console.log("SI SE PUEDOOOOOOOO");
-    
-  // }
-
 
   ngAfterViewInit()	{
 
-    console.log("SI SE PUDO");
     
     const tutRef = this.db.object('users');
 
@@ -57,12 +45,6 @@ export class RealfireComponent implements AfterViewInit{
  
     // set() for destructive updates
     tutRef.update(user);
-
-    console.log("MANDADOOOOO");
-    
-    delay(1000)
-    // this.router.navigate(["/home", {element: "r86V5YDkvXQif0edpN6w"}])
-
 
   }
 
