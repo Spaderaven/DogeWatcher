@@ -58,9 +58,8 @@ export class HomeComponent{
   }
 
   CheckPrice(result)  {
-    console.log(result);
-    if(result?.dogecoin.btc >= this.user?.valueHigh){ this.SendColor(this.user?.colorHigh) }
-    else if(result?.dogecoin.btc <= this.user?.valueLow){ this.SendColor(this.user?.colorLow) }
+    if(result?.dogecoin.mxn >= this.user?.valueHigh){ this.SendColor(this.user?.colorHigh) }
+    else if(result?.dogecoin.mxn <= this.user?.valueLow){ this.SendColor(this.user?.colorLow) }
   }
 
   changeCompleteGoodPrice(event){
@@ -76,22 +75,23 @@ export class HomeComponent{
   }
 
   onEnter() {
-    console.log(this.user);
-    console.log(this.newHighValue);
     const newUser = {
-      valueHigh: this.newHighValue,
-      colorHigh: this.newHigColor,
-      valueLow: this.newLowValue,
-      colorLow: this.newLowColor,
+      valueHigh: this.newHighValue ? this.newHighValue : this.user.valueHigh,
+      colorHigh: this.newHigColor ? this.newHigColor : this.user?.colorHigh,
+      valueLow: this.newLowValue ? this.newLowValue : this.user.valueLow,
+      colorLow: this.newLowColor ? this.newLowColor : this.user?.colorLow,
       email: this.user.email,
       password: this.user.password
     };
     
     this.store.collection('users').doc(this.fireBaseId).set(newUser);
+    this.user = newUser;
+    console.log("saved");
+    
   }
 
   SendColor(color){
-    console.log(color);
+    console.log("EL COLOOOOOOOOOR", color);
     // SEND TO THE THIIIIIIIIING
   }
 
