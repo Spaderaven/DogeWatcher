@@ -1,9 +1,12 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { interval, Observable } from 'rxjs';
 import { mapTo, startWith, map, flatMap } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
+import { MiserviceService } from '../miservice.service';
+import { RealfireComponent } from '../realfire/realfire.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -24,27 +27,25 @@ export class HomeComponent{
   newHigColor;
   newLowColor;
 
-  constructor( private _http: HttpClient, private store: AngularFirestore, private route: ActivatedRoute ) {
+  @Output() messageEvent = new EventEmitter<string>();
+
+  constructor( private router: Router, private _http: HttpClient, private store: AngularFirestore, private route: ActivatedRoute, private miService: MiserviceService ) {
 
     const elem = this.route.snapshot.paramMap.get("element");
-    this.fireBaseId = elem;
-    console.log(elem);
+    this.fireBaseId = elem;    
     
 
-    this.prueba = this.store.collection('users').snapshotChanges();  
-    console.log("LA PUREBA: ", this.prueba);
+    this.prueba = this.store.collection('users').snapshotChanges();      
 
     this.store.collection('users').doc(elem).ref.get().then( (doc) => this.GetUser(doc) );
   }
   
   GetUser(doc) {
-    if (doc.exists) {
-      console.log(doc.data());
-      this.user = doc.data();
-      console.log("NEW USER: ", this.user);
+    if (doc.exists) {      
+      this.user = doc.data();      
       
       this.isLoading = false;
-    } else {
+    } else {      
       console.log("There is no document!");
     }
   }
@@ -53,23 +54,26 @@ export class HomeComponent{
      this.posts = interval(1000).subscribe( x => {
       this._http.get('https://api.coingecko.com/api/v3/simple/price?ids=Dogecoin&vs_currencies=mxn')
       .pipe(map(data => this.info = data)).subscribe(result => {this.CheckPrice(result)} ) 
-    })
-    console.log(this.user);
+    })    
   }
 
   CheckPrice(result)  {
-    if(result?.dogecoin.mxn >= this.user?.valueHigh){ this.SendColor(this.user?.colorHigh) }
-    else if(result?.dogecoin.mxn <= this.user?.valueLow){ this.SendColor(this.user?.colorLow) }
+    if(result?.dogecoin.mxn >= this.user?.valueHigh){ 
+      const res = this.fireBaseId + "," + this.user?.colorHigh + "," + "High";
+      this.SendColor(res)
+     }
+    else if(result?.dogecoin.mxn <= this.user?.valueLow){ 
+      const res = this.fireBaseId + "," + this.user?.colorLow + "," + "Low";
+      this.SendColor(res)
+     }
   }
 
-  changeCompleteGoodPrice(event){
-    console.log(event.color.hex);
+  changeCompleteGoodPrice(event){    
     this.isChange = true
     this.newHigColor = event.color.hex;
   }
 
-  changeCompleteBadPrice(event){
-    console.log(event);
+  changeCompleteBadPrice(event){    
     this.isChange = true
     this.newLowColor = event.color.hex;
   }
@@ -85,14 +89,13 @@ export class HomeComponent{
     };
     
     this.store.collection('users').doc(this.fireBaseId).set(newUser);
-    this.user = newUser;
-    console.log("saved");
-    
+    this.user = newUser;    
+    this.isChange = false
   }
 
-  SendColor(color){
-    console.log("EL COLOOOOOOOOOR", color);
-    // SEND TO THE THIIIIIIIIING
+  SendColor(res){    
+    this.miService.sendNewEvent(res);
+    this.router.navigate(["/fire", {element: res}])
   }
 
 }
