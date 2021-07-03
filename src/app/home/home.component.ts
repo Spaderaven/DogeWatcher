@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { interval, Observable } from 'rxjs';
 import { mapTo, startWith, map, flatMap } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -13,15 +14,9 @@ export class HomeComponent{
   posts;
   info;
   isChange = false;
-
-  user = {
-    id: 0,
-    name: "",
-    valueHigh: 10000,
-    colorHigh: "#fff",
-    valueLow: 0.00,
-    colorLow: "#fff"
-  };
+  isLoading = true;
+  user: any;
+  fireBaseId;
 
   prueba;
   newHighValue;
@@ -29,24 +24,29 @@ export class HomeComponent{
   newHigColor;
   newLowColor;
 
-  constructor( private _http: HttpClient, private store: AngularFirestore ) {
+  constructor( private _http: HttpClient, private store: AngularFirestore, private route: ActivatedRoute ) {
+
+    const elem = this.route.snapshot.paramMap.get("element");
+    this.fireBaseId = elem;
+    console.log(elem);
+    
+
     this.prueba = this.store.collection('users').snapshotChanges();  
     console.log("LA PUREBA: ", this.prueba);
 
-    this.store.collection('users').doc("VRbUyz3whrCc9749Zw8W").ref.get().then(function (doc) {
-      if (doc.exists) {
-        console.log(doc.data());
-      } else {
-        console.log("There is no document!");
-      }
-    }).catch(function (error) {
-      console.log("There was an error getting your document:", error);
-    });    
-
-    // this.store.collection('users').add(this.user);
-
-    this.store.collection('users').valueChanges().subscribe(val => console.log(val))
-    this.store.collection('users').get().subscribe(val => console.log(val))
+    this.store.collection('users').doc(elem).ref.get().then( (doc) => this.GetUser(doc) );
+  }
+  
+  GetUser(doc) {
+    if (doc.exists) {
+      console.log(doc.data());
+      this.user = doc.data();
+      console.log("NEW USER: ", this.user);
+      
+      this.isLoading = false;
+    } else {
+      console.log("There is no document!");
+    }
   }
 
   ngOnInit() {
@@ -67,7 +67,6 @@ export class HomeComponent{
     console.log(event.color.hex);
     this.isChange = true
     this.newHigColor = event.color.hex;
-    // Save Database
   }
 
   changeCompleteBadPrice(event){
@@ -83,10 +82,12 @@ export class HomeComponent{
       valueHigh: this.newHighValue,
       colorHigh: this.newHigColor,
       valueLow: this.newLowValue,
-      colorLow: this.newLowColor
+      colorLow: this.newLowColor,
+      email: this.user.email,
+      password: this.user.password
     };
     
-    this.store.collection('users').add(newUser);
+    this.store.collection('users').doc(this.fireBaseId).set(newUser);
   }
 
   SendColor(color){
