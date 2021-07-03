@@ -1,32 +1,31 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { HttpClientModule } from '@angular/common/http';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { ColorSketchModule } from 'ngx-color/sketch';
 import { ColorSliderModule } from 'ngx-color/slider'; // <color-slider></color-slider>
 import { AngularFireModule } from '@angular/fire';
-import { environment } from '../environments/environment.prod';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../environments/environment.prod';
+import { HomeComponent } from './home.component';
+
+const MODULE_ROUTES = [
+  { path: '', component: HomeComponent }
+];
+
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [HomeComponent],
   imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule, 
-    TooltipModule.forRoot(),
+    CommonModule,
+    RouterModule,
     ColorSketchModule,
     ColorSliderModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFireModule,
-    FormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    FormsModule,
+    RouterModule.forChild(MODULE_ROUTES)
+  ]
 })
-export class AppModule { }
+export class HomeModule { }

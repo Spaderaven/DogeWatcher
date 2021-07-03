@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "firedogewatcher": {
+      "hosting": {
+        "ProyectoWeb": [
+          "firedogewatcher"
+        ]
+      }
+    }
+  }
+}
